@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="LendFlow.API/LendFlow.API.csproj" />
+  <Project Path="LendFlow.BLL/LendFlow.BLL.csproj" />
+  <Project Path="LendFlow.DAL/LendFlow.DAL.csproj" />
+</Solution>

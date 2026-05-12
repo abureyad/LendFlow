@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LendFlow Escrow Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 40px; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #2c3e50; }
+        tr:hover { background-color: #f1f5f8; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }
+        .status-Pending { background-color: #ffeaa7; color: #d35400; }
+        .status-Funded { background-color: #81ecec; color: #00b894; }
+        .status-Delivered { background-color: #74b9ff; color: #0984e3; }
+        .status-Released { background-color: #55efc4; color: #00b894; }
+        .status-Disputed { background-color: #ff7675; color: #d63031; }
+        .status-Refunded { background-color: #dfe6e9; color: #636e72; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛡️ LendFlow Escrow Live Ledger</h1>
+    <p>Real-time monitoring of all P2P freelance contracts and vault states.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Contract ID</th>
+                <th>Freelance Job (Kaggle Data)</th>
+                <th>Client (Buyer)</th>
+                <th>Freelancer (Seller)</th>
+                <th>Vault Amount</th>
+                <th>State Machine Status</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    const API_URL = 'https://localhost:7274/api/escrow/all';
+
+    async function fetchContracts() {
+        try {
+            const response = await fetch(API_URL);
+            const contracts = await response.json();
+            
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            contracts.forEach(contract => {
+                const row = `
+                    <tr>
+                        <td>#${contract.id}</td>
+                        <td><strong>${contract.item}</strong></td>
+                        <td>${contract.buyer}</td>
+                        <td>${contract.seller}</td>
+                        <td><strong>$${contract.amount.toFixed(2)}</strong></td>
+                        <td><span class="badge status-${contract.status}">${contract.status}</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            document.getElementById('table-body').innerHTML = '<tr><td colspan="6" style="color:red;">Failed to load API data. Ensure the API is running and CORS is enabled.</td></tr>';
+        }
+    }
+
+    // Load data immediately, then refresh every 3 seconds
+    fetchContracts();
+    setInterval(fetchContracts, 3000);
+</script>
+
+</body>
+</html>
